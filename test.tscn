@@ -1,0 +1,28 @@
+[gd_scene format=3 uid="uid://ltwg5pqtncp8"]
+
+[ext_resource type="Script" uid="uid://dultqtya5hyly" path="res://player/Player.cs" id="1_8uh7m"]
+[ext_resource type="Texture2D" uid="uid://b6l575dn86xnd" path="res://icon.svg" id="1_37kl0"]
+
+[sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_jlkxj"]
+distance = -420.0
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_a43n5"]
+
+[node name="Node2D" type="Node2D" unique_id=1967931282]
+
+[node name="Floor" type="StaticBody2D" parent="." unique_id=713405192]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Floor" unique_id=1467156386]
+shape = SubResource("WorldBoundaryShape2D_jlkxj")
+
+[node name="CharacterBody2D" type="CharacterBody2D" parent="." unique_id=1503554284]
+position = Vector2(282, 124)
+script = ExtResource("1_8uh7m")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CharacterBody2D" unique_id=76991473]
+shape = SubResource("CapsuleShape2D_a43n5")
+
+[node name="Sprite2D" type="Sprite2D" parent="CharacterBody2D" unique_id=1497445621]
+position = Vector2(-4.7683716e-07, -4.7683716e-07)
+scale = Vector2(0.171875, 0.171875)
+texture = ExtResource("1_37kl0")
