@@ -15,6 +15,10 @@ run/main_scene="uid://ltwg5pqtncp8"
 config/features=PackedStringArray("4.7", "C#", "Forward Plus")
 config/icon="res://icon.svg"
 
+[display]
+
+window/stretch/mode="canvas_items"
+
 [dotnet]
 
 project/assembly_name="junk_dog"
@@ -58,4 +62,5 @@ DOWN={
 
 [rendering]
 
+textures/canvas_textures/default_texture_filter=0
 rendering_device/driver.windows="d3d12"
