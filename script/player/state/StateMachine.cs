@@ -1,20 +1,24 @@
-
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using Godot;
 
 public abstract class StateMachine<T> where T : IStateObject<T>
 {
     public IBehaviourState<T> OriginState { get; init; }
-    protected Dictionary<string, IBehaviourState<T>> _states = [];
+    protected Dictionary<StateHandle, IBehaviourState<T>> _states = [];
     protected Dictionary<IBehaviourState<T>, List<StateTransition<T>>> _transitions = [];
+    protected IStateBus _eventBus;
     private int _frame = 0;
 
-    public void AddState(string stateHandle, IBehaviourState<T> state)
+    public void LinkStateBus(IStateBus stateBus)
+    {
+	_eventBus = stateBus;
+    }
+
+    public void AddState(StateHandle stateHandle, IBehaviourState<T> state)
     {
         _states[stateHandle] = state;
-        _transitions[state] = state.GetTransitions();
+        _transitions[state] = state.Transitions;
     }
 
     public void Update(T stateObject, double delta)
@@ -35,17 +39,23 @@ public abstract class StateMachine<T> where T : IStateObject<T>
         {
             if(transition.TransitionFunction(stateObject))
             {
-                outState = _states[transition.EndStateName];
+                outState = _states[transition.EndState];
             }
         }
 
         if(outState != null)
         {
-            GD.Print($"[{_frame}][SM:{typeof(T)}] {stateObject.CurrentState.Name} -> {outState.Name}");
+            // GD.Print($"[{_frame}][SM:{typeof(T)}] {stateObject.CurrentState.Handle} -> {outState.Handle}");
             stateObject.CurrentState.Exit(stateObject);
-            stateObject.PreviousState = stateObject.PreviousState;
-            outState.Enter(stateObject, stateObject.PreviousState);
+	    GD.Print($"Exited state {stateObject.CurrentState.Handle}");
+	    _eventBus.ExitState(stateObject.CurrentState.Handle);
+
+            stateObject.PreviousState = stateObject.CurrentState;
             stateObject.CurrentState = outState;
+            stateObject.CurrentState.Enter(stateObject, stateObject.PreviousState);
+	    GD.Print($"Entered state {stateObject.CurrentState.Handle}");
+	    _eventBus.EnterState(stateObject.CurrentState.Handle);
+
             stateObject.CurrentStateDuration = 0.0;
         }
     }

@@ -1,3 +1,4 @@
+using System.Reflection;
 using Godot;
 
 public class PlayerMovementStateObject : IStateObject<PlayerMovementStateObject>
@@ -24,5 +25,18 @@ public class PlayerMovementStateObject : IStateObject<PlayerMovementStateObject>
         IsOnFloor = false;
         Gravity = PlayerProperties.GRAVITY;
         Facing = LEFT;
+    }
+
+    public override string ToString()
+    {
+	var output = $"[PlayerMovementStateObject]\n";
+	foreach(var member in typeof(PlayerMovementStateObject).GetMembers())
+	{
+	    if(member.MemberType == MemberTypes.Property)
+	    {
+		output += $"\t{member.Name}: {((PropertyInfo)member).GetValue(this)}\n";
+	    }
+	}
+	return output;
     }
 }

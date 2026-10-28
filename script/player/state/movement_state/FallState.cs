@@ -1,30 +1,19 @@
 using System.Collections.Generic;
 using System.Linq;
-using Godot;
 
 public class FallState : IBehaviourState<PlayerMovementStateObject>
 {
-    public string Name => StateHandle.FALL;
+    public StateHandle Handle => StateHandle.FALL;
 
-    public void Enter(PlayerMovementStateObject state, IBehaviourState<PlayerMovementStateObject> previousState)
-    {
-    }
+    public List<StateTransition<PlayerMovementStateObject>> Transitions { get; }
 
-    public void Exit(PlayerMovementStateObject state)
+    public FallState()
     {
-    }
-
-    public void Update(PlayerMovementStateObject stateObject, double delta)
-    {
-    }
-
-    public List<StateTransition<PlayerMovementStateObject>> GetTransitions()
-    {
-        return [
-            new (Name, StateHandle.JUMP, JumpTransition, priority: 5),
-            new (Name, StateHandle.IDLE, IdleTransition, priority: 4),
-            new (Name, StateHandle.MOVE, MoveTransition, priority: 4),
-            new (Name, StateHandle.WALLSLIDE, WallTransition, priority: 3),
+        Transitions = [
+            new (Handle, StateHandle.JUMP, JumpTransition, priority: 5),
+            new (Handle, StateHandle.IDLE, IdleTransition, priority: 4),
+            new (Handle, StateHandle.MOVE, MoveTransition, priority: 4),
+            new (Handle, StateHandle.WALLSLIDE, WallTransition, priority: 3),
         ];
     }
 
@@ -43,11 +32,23 @@ public class FallState : IBehaviourState<PlayerMovementStateObject>
         return 
             state.Input.JumpActuationBuffer.Contains(true)
             && state.CurrentStateDuration < PlayerProperties.COYOTE_TIME
-            && PlayerProperties.ValidCoyoteStates.Contains(state.PreviousState.Name);
+            && PlayerProperties.ValidCoyoteStates.Contains(state.PreviousState.Handle);
     }
 
     private bool WallTransition(PlayerMovementStateObject state)
     {
         return state.IsOnWall;
+    }
+
+    public void Update(PlayerMovementStateObject stateObject, double delta)
+    {
+    }
+
+    public void Enter(PlayerMovementStateObject stateObject, IBehaviourState<PlayerMovementStateObject> previousState)
+    {
+    }
+
+    public void Exit(PlayerMovementStateObject stateObject)
+    {
     }
 }

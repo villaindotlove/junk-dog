@@ -2,7 +2,17 @@ using System.Collections.Generic;
 
 public class MoveState : IBehaviourState<PlayerMovementStateObject>
 {
-    public string Name => StateHandle.MOVE;
+    public StateHandle Handle => StateHandle.MOVE;
+    public List<StateTransition<PlayerMovementStateObject>> Transitions { get; }
+
+    public MoveState()
+    {
+	Transitions = [
+            new (Handle, StateHandle.FALL, FallTransition, 5),
+            new (Handle, StateHandle.IDLE, IdleTransition, 1),
+            new (Handle, StateHandle.JUMP, JumpTransition, 0)
+	];
+    }
 
     public void Enter(PlayerMovementStateObject state, IBehaviourState<PlayerMovementStateObject> previousState)
     {
@@ -14,15 +24,6 @@ public class MoveState : IBehaviourState<PlayerMovementStateObject>
 
     public void Update(PlayerMovementStateObject stateObject, double delta)
     {
-    }
-
-    public List<StateTransition<PlayerMovementStateObject>> GetTransitions()
-    {
-        return [
-            new (Name, StateHandle.FALL, FallTransition, 5),
-            new (Name, StateHandle.IDLE, IdleTransition, 1),
-            new (Name, StateHandle.JUMP, JumpTransition, 0),
-        ];
     }
 
     private bool IdleTransition(PlayerMovementStateObject state)

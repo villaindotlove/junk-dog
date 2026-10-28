@@ -1,10 +1,17 @@
-
 using System.Collections.Generic;
-using Godot;
 
 public class NoActionState : IBehaviourState<PlayerActionStateObject>
 {
-    public string Name => StateHandle.NO_ACTION;
+    public StateHandle Handle => StateHandle.NO_ACTION;
+    public List<StateTransition<PlayerActionStateObject>> Transitions { get; }
+    
+    public NoActionState()
+    {
+        Transitions = [
+            new (Handle, StateHandle.GRAB, GrabTransition, priority: 0),
+        ];
+    }
+
 
     public void Enter(PlayerActionStateObject stateObject, IBehaviourState<PlayerActionStateObject> previousState)
     {
@@ -16,13 +23,6 @@ public class NoActionState : IBehaviourState<PlayerActionStateObject>
 
     public void Update(PlayerActionStateObject stateObject, double delta)
     {
-    }
-
-    public List<StateTransition<PlayerActionStateObject>> GetTransitions()
-    {
-        return [
-            new (Name, StateHandle.GRAB, GrabTransition, priority: 0),
-        ];
     }
 
     private bool GrabTransition(PlayerActionStateObject stateObject)

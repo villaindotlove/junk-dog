@@ -3,7 +3,7 @@ using Godot;
 
 public static class PlayerProperties
 {
-    public readonly static string[] ValidCoyoteStates = [StateHandle.MOVE, StateHandle.IDLE];
+    public readonly static StateHandle[] ValidCoyoteStates = [StateHandle.MOVE, StateHandle.IDLE];
     public readonly static Vector2 GRABBOX_OFFSET = new(-7.0f, -5f);
     public readonly static Vector2 HELD_ITEM_OFFSET = new(0.0f, -30.0f);
     public const float SPEED = 250.0f;

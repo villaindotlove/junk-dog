@@ -1,9 +1,17 @@
-
 using System.Collections.Generic;
 
 public class WalljumpState : IBehaviourState<PlayerMovementStateObject>
 {
-    public string Name => StateHandle.WALLJUMP;
+    public StateHandle Handle => StateHandle.WALLJUMP;
+    public List<StateTransition<PlayerMovementStateObject>> Transitions { get; }
+
+    public WalljumpState()
+    {
+        Transitions = [
+            new(Handle, StateHandle.FALL, FallTransition, 4),
+            new(Handle, StateHandle.WALLSLIDE, WallslideTransition, 5),
+        ];
+    }
 
     public void Enter(PlayerMovementStateObject state, IBehaviourState<PlayerMovementStateObject> previousState)
     {
@@ -14,14 +22,6 @@ public class WalljumpState : IBehaviourState<PlayerMovementStateObject>
     public void Exit(PlayerMovementStateObject state)
     {
         state.Hang = false;
-    }
-
-    public List<StateTransition<PlayerMovementStateObject>> GetTransitions()
-    {
-        return [
-            new(Name, StateHandle.FALL, FallTransition, 4),
-            new(Name, StateHandle.WALLSLIDE, WallslideTransition, 5),
-        ];
     }
 
     public void Update(PlayerMovementStateObject state, double delta)

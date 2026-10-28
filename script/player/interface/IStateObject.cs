@@ -1,6 +1,7 @@
 public interface IStateObject<T> 
 {
-    public double CurrentStateDuration { get; set; }
-    public IBehaviourState<T> CurrentState { get; set;}
-    public IBehaviourState<T> PreviousState { get; set;}
+    double CurrentStateDuration { get; set; }
+    IBehaviourState<T> CurrentState { get; set;}
+    IBehaviourState<T> PreviousState { get; set;}
+    string ToString();
 }

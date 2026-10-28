@@ -2,19 +2,19 @@ using System;
 
 public class StateTransition<T>
 {
-    public string BeginStateName { get; init; }
-    public string EndStateName { get; init; }
+    public StateHandle BeginState { get; init; }
+    public StateHandle EndState { get; init; }
     public Func<T, bool> TransitionFunction { get; init; }
     public int Priority { get; init; }
 
     public StateTransition(
-        string beginStateName,
-        string endStateName,
+        StateHandle beginState,
+        StateHandle endState,
         Func<T, bool> transitionFunction,
         int priority)
     {
-        BeginStateName = beginStateName;
-        EndStateName = endStateName;
+        BeginState = beginState;
+        EndState = endState;
         TransitionFunction = transitionFunction;
         Priority = priority;
     }

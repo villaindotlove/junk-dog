@@ -2,7 +2,15 @@ using System.Collections.Generic;
 
 public class HoldState : IBehaviourState<PlayerActionStateObject>
 {
-    public string Name => StateHandle.HOLD;
+    public StateHandle Handle => StateHandle.HOLD;
+    public List<StateTransition<PlayerActionStateObject>> Transitions { get; }
+
+    public HoldState()
+    {
+	Transitions = [
+            new(Handle, StateHandle.THROW, ThrowTransition, 0)
+        ];
+    }
 
     public void Enter(PlayerActionStateObject stateObject, IBehaviourState<PlayerActionStateObject> previousState)
     {
@@ -14,13 +22,6 @@ public class HoldState : IBehaviourState<PlayerActionStateObject>
 
     public void Update(PlayerActionStateObject stateObject, double delta)
     {
-    }
-
-    public List<StateTransition<PlayerActionStateObject>> GetTransitions()
-    {
-        return [
-            new(Name, StateHandle.THROW, ThrowTransition, 0)
-        ];
     }
 
     private bool ThrowTransition(PlayerActionStateObject state)

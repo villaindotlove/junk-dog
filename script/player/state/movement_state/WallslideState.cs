@@ -3,7 +3,18 @@ using Godot;
 
 public class WallSlideState : IBehaviourState<PlayerMovementStateObject>
 {
-    public string Name => StateHandle.WALLSLIDE;
+    public StateHandle Handle => global::StateHandle.WALLSLIDE;
+    public List<StateTransition<PlayerMovementStateObject>> Transitions { get; }
+
+    public WallSlideState()
+    {
+        Transitions = [
+            new (Handle, global::StateHandle.IDLE, IdleTransition, 2),
+            new (Handle, global::StateHandle.WALLJUMP, WalljumpTransition, 1),
+            new (Handle, global::StateHandle.FALL, FallTransition, 0),
+        ];
+    }
+
 
     public void Enter(PlayerMovementStateObject state, IBehaviourState<PlayerMovementStateObject> previousState)
     {
@@ -15,15 +26,6 @@ public class WallSlideState : IBehaviourState<PlayerMovementStateObject>
 
     public void Exit(PlayerMovementStateObject state)
     {
-    }
-
-    public List<StateTransition<PlayerMovementStateObject>> GetTransitions()
-    {
-        return [
-            new (Name, StateHandle.IDLE, IdleTransition, 2),
-            new (Name, StateHandle.WALLJUMP, WalljumpTransition, 1),
-            new (Name, StateHandle.FALL, FallTransition, 0),
-        ];
     }
 
     private bool WalljumpTransition(PlayerMovementStateObject state)

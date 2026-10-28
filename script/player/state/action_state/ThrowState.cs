@@ -2,7 +2,15 @@ using System.Collections.Generic;
 
 public class ThrowState : IBehaviourState<PlayerActionStateObject>
 {
-    public string Name => StateHandle.THROW;
+    public StateHandle Handle => StateHandle.THROW;
+    public List<StateTransition<PlayerActionStateObject>> Transitions { get; }
+
+    public ThrowState()
+    {
+	Transitions = [
+            new(Handle, StateHandle.NO_ACTION, NoActionTransition, 0),
+        ];
+    }
 
     public void Enter(PlayerActionStateObject stateObject, IBehaviourState<PlayerActionStateObject> previousState)
     {
@@ -11,13 +19,6 @@ public class ThrowState : IBehaviourState<PlayerActionStateObject>
 
     public void Exit(PlayerActionStateObject stateObject)
     {
-    }
-
-    public List<StateTransition<PlayerActionStateObject>> GetTransitions()
-    {
-        return [
-            new(Name, StateHandle.NO_ACTION, NoActionTransition, 0),
-        ];
     }
 
     public void Update(PlayerActionStateObject stateObject, double delta)

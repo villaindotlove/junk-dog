@@ -13,11 +13,14 @@ public partial class PlayerController : CharacterBody2D
     private Label _movementStateLabel;
     private Label _actionStateLabel;
     private PlayerAnimationController _playerAnimationController;
+    private PlayerEventBus _eventBus;
 
     public override void _Ready()
     {
+	LinkEventBus();
         _playerInput = new PlayerInput(new PhysicalGameInput());
         _movementStateMachine = new PlayerMovementStateMachine();
+	_movementStateMachine.LinkStateBus(Global.PlayerEventBus(this));
         _movementStateObject = new PlayerMovementStateObject(_playerInput)
         {
             CurrentState = _movementStateMachine.OriginState,
@@ -25,6 +28,7 @@ public partial class PlayerController : CharacterBody2D
         };
 
         _actionStateMachine = new PlayerActionStateMachine();
+	_actionStateMachine.LinkStateBus(Global.PlayerEventBus(this));
         _actionStateObject = new PlayerActionStateObject(_playerInput)
         {
             CurrentState = _actionStateMachine.OriginState,
@@ -85,83 +89,70 @@ public partial class PlayerController : CharacterBody2D
     {
         _movementStateMachine.Update(_movementStateObject, delta);
         _actionStateMachine.Update(_actionStateObject, delta);
-        _movementStateLabel.Text = _movementStateObject.CurrentState.Name;
-        _actionStateLabel.Text = _actionStateObject.CurrentState.Name;
+        _movementStateLabel.Text = _movementStateObject.CurrentState.Handle.ToString();
+        _actionStateLabel.Text = _actionStateObject.CurrentState.Handle.ToString();
+    }
+
+    private void OnStateEnter(string stateName)
+    {
+	var handle = StateHandleExtensions.StateHandleFromString(stateName);
+	switch(handle)
+	{
+	    case StateHandle.GRAB:
+		EnableGrabHitbox();
+		break;
+	    case StateHandle.THROW:
+		ThrowHeldItem();
+		_actionStateObject.HeldItem = null;
+		_actionStateObject.HasItem = false;
+		break;
+	    default:
+		break;
+	}
+    }
+
+    private void OnStateExit(string stateName)
+    {
+	var handle = StateHandleExtensions.StateHandleFromString(stateName);
+	switch(handle)
+	{
+	    case StateHandle.GRAB:
+		DisableGrabHitbox();
+		break;
+	    default:
+		break;
+	}
     }
 
     private void ProcessActiveActionState(double delta)
     {
-        switch (_actionStateObject.CurrentState.Name)
+        switch (_actionStateObject.CurrentState.Handle)
         {
-            case StateHandle.GRAB:
-                ProcessGrabState(delta);
-                break;
-            case StateHandle.HOLD:
-                ProcessHoldState(delta);
-                break;
-            case StateHandle.THROW:
-                ProcessThrowState(delta);
-                break;
             default:
                 break;
         }
     }
 
-    private void ProcessGrabState(double delta)
-    {
-        if(!_actionStateObject.GrabBoxActive)
-        {
-            EnableGrabHitbox();
-        }
-
-        if(_actionStateObject.HasItem || _actionStateObject.CurrentStateDuration >= PlayerProperties.GRAB_DURATION)
-        {
-            DisableGrabHitbox();
-        }
-    }
-
-    private void ProcessHoldState(double delta)
-    {
-        DisableGrabHitbox();
-    }
-
-    private void ProcessThrowState(double delta)
-    {
-        DisableGrabHitbox();
-        if(_actionStateObject.ThrowHeldItem)
-        {
-            ThrowHeldItem();
-            _actionStateObject.ThrowHeldItem = false;
-            _actionStateObject.HeldItem = null;
-            _actionStateObject.HasItem = false;
-        }
-    }
-
     private void ProcessActiveMovementState(double delta)
     {
-        switch(_movementStateObject.CurrentState.Name)
+        switch(_movementStateObject.CurrentState.Handle)
         {
             case StateHandle.MOVE:
-                _playerAnimationController.PlayAnimation(AnimationName.WALK);
                 ProcessMovementState(delta);
                 break;
             case StateHandle.IDLE:
-                _playerAnimationController.PlayAnimation(AnimationName.IDLE);
                 ProcessIdleState(delta);
                 break;
             case StateHandle.FALL:
-                _playerAnimationController.PlayAnimation(AnimationName.JUMP);
                 ProcessFallState(delta);
                 break;
             case StateHandle.JUMP:
-                _playerAnimationController.PlayAnimation(AnimationName.JUMP);
                 ProcessJumpState(delta);
                 break;
             case StateHandle.WALLSLIDE:
                 ProcessWallslideState(delta);
                 break;
             case StateHandle.WALLJUMP:
-                _playerAnimationController.PlayAnimation(AnimationName.JUMP);
                 ProcessWalljumpState(delta);
                 break;
             default:
@@ -410,5 +401,12 @@ public partial class PlayerController : CharacterBody2D
             _grabHitbox.Position *= new Vector2(-1, 1);
             _playerAnimationController.Flip();
         }
+    }
+
+    private void LinkEventBus()
+    {
+	_eventBus = Global.PlayerEventBus(this);
+	_eventBus.StateEntered += OnStateEnter;
+	_eventBus.StateExit += OnStateExit;
     }
 }

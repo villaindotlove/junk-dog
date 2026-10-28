@@ -1,9 +1,20 @@
 using System.Collections.Generic;
-using Godot;
 
 public class IdleState : IBehaviourState<PlayerMovementStateObject>
 {
-    public string Name => StateHandle.IDLE;
+    public StateHandle Handle => StateHandle.IDLE;
+
+    public List<StateTransition<PlayerMovementStateObject>> Transitions { get; }
+
+    public IdleState()
+    {
+	Transitions = [
+            new (Handle, StateHandle.JUMP, JumpTransition, priority: 5),
+            new (Handle, StateHandle.MOVE, MoveTransition, priority: 1),
+            new (Handle, StateHandle.FALL, FallTransition, priority: 0),
+        ];
+
+    }
 
     public void Enter(PlayerMovementStateObject state, IBehaviourState<PlayerMovementStateObject> previousState)
     {
@@ -17,15 +28,6 @@ public class IdleState : IBehaviourState<PlayerMovementStateObject>
     {
     }
 
-    public List<StateTransition<PlayerMovementStateObject>> GetTransitions()
-    {
-        return [
-            new (Name, StateHandle.JUMP, JumpTransition, priority: 5),
-            new (Name, StateHandle.MOVE, MoveTransition, priority: 1),
-            new (Name, StateHandle.FALL, FallTransition, priority: 0),
-        ];
-    }
-    
     private bool JumpTransition(PlayerMovementStateObject state)
     {
         return state.Input.JumpActuationBuffer.Contains(true);
